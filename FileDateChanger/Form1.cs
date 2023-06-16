@@ -45,7 +45,7 @@ namespace FileDateChanger
         private readonly INIFile INI = new INIFile();
         private readonly MaterialSkinManager themeManager = null;
         private int selectedIndex = -1;
-        private bool editText = false;
+        private bool fileEditing = false;
 
         private void TextBox1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -56,7 +56,7 @@ namespace FileDateChanger
                     break;
 
                 case Keys.Escape:
-                    editText = false;
+                    fileEditing = false;
                     EndEdit();
                     break;
             }
@@ -64,10 +64,16 @@ namespace FileDateChanger
 
         private void TextBox1_LostFocus(object sender, EventArgs e)
         {
-            if (editText)
+            if (fileEditing)
             {
                 EndEdit();
             }
+        }
+
+        private void ShowMessageBox(string message)
+        {
+            MaterialSnackBar snackBar = new MaterialSnackBar(message, 1300);
+            snackBar.Show(this);
         }
 
         private void BeginEdit()
@@ -80,7 +86,7 @@ namespace FileDateChanger
                 textBox1.Width = rectangle.Width + 2;
                 textBox1.Text = Path.GetFileNameWithoutExtension(listBox1.Items[selectedIndex].ToString());
                 textBox1.Focus();
-                editText = true;
+                fileEditing = true;
             }
         }
 
@@ -88,29 +94,29 @@ namespace FileDateChanger
         {
             if (selectedIndex >= 0)
             {
-                if (editText)
+                if (fileEditing)
                 {
                     string oldFullFileName = listBox1.Items[selectedIndex].ToString();
                     string oldName = Path.GetFileNameWithoutExtension(oldFullFileName);
                     string newName = textBox1.Text;
 
-                    if (newName.Length > 0 && oldName != newName)
+                    if (!string.IsNullOrEmpty(newName) && !oldName.Equals(newName))
                     {
                         string newFullFileName = oldFullFileName.Replace(oldName, newName);
-                        listBox1.Items[selectedIndex] = newFullFileName;
 
                         try
                         {
                             File.Move(oldFullFileName, newFullFileName);
+                            listBox1.Items[selectedIndex] = newFullFileName;
                         }
                         catch (Exception exc)
                         {
-                            MessageBox.Show(exc.Message);
+                            ShowMessageBox(exc.Message);
                         }
                     }
                 }
 
-                editText = false;
+                fileEditing = false;
                 textBox1.Visible = false;
             }
         }
@@ -163,7 +169,7 @@ namespace FileDateChanger
             dateTimePicker3.ResetText();
         }
 
-        private void ReadFileDate(string fileName)
+        private void GetFileDate(string fileName)
         {
             FileInfo fileInfo = new FileInfo(fileName);
 
@@ -174,7 +180,7 @@ namespace FileDateChanger
             ShowDate();
         }
 
-        private void WriteFileDate(string fileName)
+        private void SetFileDate(string fileName)
         {
             FileInfo fileInfo = new FileInfo(fileName);
 
@@ -188,7 +194,7 @@ namespace FileDateChanger
             fileInfo.Attributes = oldAttributes;
         }
 
-        private void ReadFolderDate(string folderName)
+        private void GetFolderDate(string folderName)
         {
             DirectoryInfo directoryInfo = new DirectoryInfo(folderName);
 
@@ -199,7 +205,7 @@ namespace FileDateChanger
             ShowDate();
         }
 
-        private void WriteFolderDate(string folderName)
+        private void SetFolderDate(string folderName)
         {
             DirectoryInfo directoryInfo = new DirectoryInfo(folderName);
 
@@ -217,24 +223,31 @@ namespace FileDateChanger
         {
             if (listBox1.SelectedIndex != -1)
             {
-                string name = listBox1.SelectedItem.ToString();
-                System.Diagnostics.Process.Start(name);
+                try
+                {
+                    string name = listBox1.SelectedItem.ToString();
+                    System.Diagnostics.Process.Start(name);
+                }
+                catch (Exception exc)
+                {
+                    ShowMessageBox(exc.Message);
+                }
             }
         }
 
         private void ListBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             selectedIndex = listBox1.SelectedIndex;
-            if (selectedIndex >= 0 && !editText)
+            if (!fileEditing && selectedIndex > -1)
             {
                 string name = listBox1.SelectedItem.ToString();
                 if (File.Exists(name))
                 {
-                    ReadFileDate(name);
+                    GetFileDate(name);
                 }
                 else
                 {
-                    ReadFolderDate(name);
+                    GetFolderDate(name);
                 }
             }
         }
@@ -314,8 +327,7 @@ namespace FileDateChanger
             }
             else
             {
-                MaterialSnackBar snackBar = new MaterialSnackBar("No files selected", 1300);
-                snackBar.Show(this);
+                ShowMessageBox("No files selected");
             }
         }
 
@@ -323,8 +335,7 @@ namespace FileDateChanger
         {
             listBox1.Items.Clear();
             ResetDate();
-            MaterialSnackBar snackBar = new MaterialSnackBar("List cleared", 1300);
-            snackBar.Show(this);
+            ShowMessageBox("List cleared");
         }
 
         private void Button3_Click(object sender, EventArgs e)
@@ -332,22 +343,21 @@ namespace FileDateChanger
             if (listBox1.SelectedIndex != -1)
             {
                 string name = listBox1.SelectedItem.ToString();
+
                 if (File.Exists(name))
                 {
-                    WriteFileDate(name);
+                    SetFileDate(name);
                 }
                 else
                 {
-                    WriteFolderDate(name);
+                    SetFolderDate(name);
                 }
 
-                MaterialSnackBar snackBar = new MaterialSnackBar("Done", 1300);
-                snackBar.Show(this);
+                ShowMessageBox("Done");
             }
             else
             {
-                MaterialSnackBar snackBar = new MaterialSnackBar("No selected item", 1300);
-                snackBar.Show(this);
+                ShowMessageBox("No selected item");
             }
         }
 
@@ -363,9 +373,14 @@ namespace FileDateChanger
             }
         }
 
-        private void renameToolStripMenuItem_Click(object sender, EventArgs e)
+        private void RenameToolStripMenuItem_Click(object sender, EventArgs e)
         {
             BeginEdit();
+        }
+
+        private void Button4_Click(object sender, EventArgs e)
+        {
+            ResetDate();
         }
     }
 }
