@@ -25,9 +25,9 @@ namespace FileDateChanger
             textBox1.LostFocus += TextBox1_LostFocus;
             textBox1.KeyDown += TextBox1_KeyDown;
 
-            dateTimePicker1.ValueChanged += (s, e) => ShowDate();
-            dateTimePicker2.ValueChanged += (s, e) => ShowDate();
-            dateTimePicker3.ValueChanged += (s, e) => ShowDate();
+            dateTimePicker1.ValueChanged += (s, e) => label4.Text = dateTimePicker1.Value.ToShortDateString();
+            dateTimePicker2.ValueChanged += (s, e) => label5.Text = dateTimePicker2.Value.ToShortDateString();
+            dateTimePicker3.ValueChanged += (s, e) => label6.Text = dateTimePicker3.Value.ToShortDateString();
 
             themeManager = MaterialSkinManager.Instance;
             themeManager.AddFormToManage(this);
@@ -123,7 +123,7 @@ namespace FileDateChanger
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            ShowDate();
+            ResetDate();
             Location = new Point(INI.Parse("Main", "X"), INI.Parse("Main", "Y"));
             materialSwitch1.Checked = INI.Read("Main", "Theme").Equals("DARK");
         }
@@ -155,13 +155,6 @@ namespace FileDateChanger
             AddItems(files);
         }
 
-        private void ShowDate()
-        {
-            label4.Text = dateTimePicker1.Value.ToShortDateString();
-            label5.Text = dateTimePicker2.Value.ToShortDateString();
-            label6.Text = dateTimePicker3.Value.ToShortDateString();
-        }
-
         private void ResetDate()
         {
             dateTimePicker1.ResetText();
@@ -176,8 +169,6 @@ namespace FileDateChanger
             dateTimePicker1.Value = fileInfo.CreationTime;
             dateTimePicker2.Value = fileInfo.LastWriteTime;
             dateTimePicker3.Value = fileInfo.LastAccessTime;
-
-            ShowDate();
         }
 
         private void SetFileDate(string fileName)
@@ -201,8 +192,6 @@ namespace FileDateChanger
             dateTimePicker1.Value = directoryInfo.CreationTime;
             dateTimePicker2.Value = directoryInfo.LastWriteTime;
             dateTimePicker3.Value = directoryInfo.LastAccessTime;
-
-            ShowDate();
         }
 
         private void SetFolderDate(string folderName)
