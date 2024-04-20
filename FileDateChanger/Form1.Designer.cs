@@ -218,7 +218,7 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(62, 355);
+            this.textBox1.Location = new System.Drawing.Point(116, 124);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 22);
             this.textBox1.TabIndex = 19;
@@ -231,7 +231,7 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(333, 36);
             this.button4.TabIndex = 20;
-            this.button4.Text = "Set Date Now";
+            this.button4.Text = "Reset Date";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.Button4_Click);
             // 
@@ -261,6 +261,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Padding = new System.Windows.Forms.Padding(3, 24, 4, 4);
+            this.Text = "yktj";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.contextMenuStrip1.ResumeLayout(false);

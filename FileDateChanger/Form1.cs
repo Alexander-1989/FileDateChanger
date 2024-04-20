@@ -5,11 +5,20 @@ using MaterialSkin.Controls;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Drawing;
+using FileDateChanger.Services;
 
 namespace FileDateChanger
 {
     public partial class Form1 : MaterialForm
     {
+        public Form1(string[] args) : this()
+        {
+            if (args?.Length > 0)
+            {
+                AddItems(GetAllFiles(args));
+            }
+        }
+
         public Form1()
         {
             InitializeComponent();
@@ -42,7 +51,7 @@ namespace FileDateChanger
         }
 
 
-        private readonly INIFile INI = new INIFile();
+        private readonly Serializer serializer = new Serializer();
         private readonly MaterialSkinManager themeManager = null;
         private int selectedIndex = -1;
         private bool fileEditing = false;
@@ -96,18 +105,18 @@ namespace FileDateChanger
             {
                 if (fileEditing)
                 {
-                    string oldFullFileName = listBox1.Items[selectedIndex].ToString();
-                    string oldName = Path.GetFileNameWithoutExtension(oldFullFileName);
+                    string oldFullName = listBox1.Items[selectedIndex].ToString();
+                    string oldName = Path.GetFileNameWithoutExtension(oldFullName);
                     string newName = textBox1.Text;
 
                     if (!string.IsNullOrEmpty(newName) && !oldName.Equals(newName))
                     {
-                        string newFullFileName = oldFullFileName.Replace(oldName, newName);
+                        string newFullName = oldFullName.Replace(oldName, newName);
 
                         try
                         {
-                            File.Move(oldFullFileName, newFullFileName);
-                            listBox1.Items[selectedIndex] = newFullFileName;
+                            File.Move(oldFullName, newFullName);
+                            listBox1.Items[selectedIndex] = newFullName;
                         }
                         catch (Exception exc)
                         {
@@ -124,15 +133,16 @@ namespace FileDateChanger
         private void Form1_Load(object sender, EventArgs e)
         {
             ResetDate();
-            Location = new Point(INI.Parse("Main", "X"), INI.Parse("Main", "Y"));
-            materialSwitch1.Checked = INI.Read("Main", "Theme").Equals("DARK");
+            serializer.Open();
+            Location = serializer.Properties.Location;
+            materialSwitch1.Checked = serializer.Properties.DarkTheme;
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            INI.Write("Main", "X", Location.X);
-            INI.Write("Main", "Y", Location.Y);
-            INI.Write("Main", "Theme", themeManager.Theme);
+            serializer.Properties.Location = Location;
+            serializer.Properties.DarkTheme = materialSwitch1.Checked;
+            serializer.Save();
         }
 
         private void ListBox1_MouseDown(object sender, MouseEventArgs e)
