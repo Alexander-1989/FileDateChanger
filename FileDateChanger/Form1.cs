@@ -106,13 +106,14 @@ namespace FileDateChanger
                 if (fileEditing)
                 {
                     string oldFullName = listBox1.Items[selectedIndex].ToString();
-                    string oldName = Path.GetFileNameWithoutExtension(oldFullName);
+                    string directory = Path.GetDirectoryName(oldFullName);
+                    string extension = Path.GetExtension(oldFullName);
+
                     string newName = textBox1.Text;
+                    string newFullName = Path.Combine(directory, newName + extension);
 
-                    if (!string.IsNullOrEmpty(newName) && !oldName.Equals(newName))
+                    if (!string.IsNullOrEmpty(newName) && !oldFullName.Equals(newFullName))
                     {
-                        string newFullName = oldFullName.Replace(oldName, newName);
-
                         try
                         {
                             File.Move(oldFullName, newFullName);
@@ -237,6 +238,7 @@ namespace FileDateChanger
         private void ListBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             selectedIndex = listBox1.SelectedIndex;
+
             if (!fileEditing && selectedIndex > -1)
             {
                 string name = listBox1.SelectedItem.ToString();
@@ -380,6 +382,35 @@ namespace FileDateChanger
         private void Button4_Click(object sender, EventArgs e)
         {
             ResetDate();
+        }
+
+        private void SetRandomNameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selectedIndex >= 0)
+            {
+                Visible = false;
+
+                string oldFullName = listBox1.Items[selectedIndex].ToString();
+                string oldName = Path.GetFileNameWithoutExtension(oldFullName);
+
+                string directory = Path.GetDirectoryName(oldFullName);
+                string extension = Path.GetExtension(oldFullName);
+
+                using (RandomNameForm form = new RandomNameForm(oldName))
+                {
+                    form.ShowDialog(this);
+                    string newName = form.GetName();
+                    string newFullName = Path.Combine(directory, newName + extension);
+
+                    if (!string.IsNullOrEmpty(newName) && !oldName.Equals(newName))
+                    {
+                        File.Move(oldFullName, newFullName);
+                        listBox1.Items[selectedIndex] = newFullName;
+                    }
+                }
+
+                Visible = true;
+            }
         }
     }
 }
