@@ -8,6 +8,8 @@ namespace FileDateChanger
     {
         private readonly Random random = new Random();
 
+        public string RandomName => textBox1.Text;
+
         public RandomNameForm()
         {
             InitializeComponent();
@@ -16,7 +18,7 @@ namespace FileDateChanger
         public RandomNameForm(string name) : this()
         {
             textBox1.Text = name;
-            numericUpDown1.Value = name.Length;
+            numericUpDown1.Value = random.Next(5, 10);
             numericUpDown1.ValueChanged += NumericUpDown1_ValueChanged;
         }
 
@@ -60,11 +62,6 @@ namespace FileDateChanger
         private void Button1_Click(object sender, EventArgs e)
         {
             GetRandomName();
-        }
-
-        public string GetName()
-        {
-            return textBox1.Text;
         }
     }
 }

@@ -48,6 +48,8 @@ namespace FileDateChanger
                 Accent.LightBlue200,
                 TextShade.BLACK
                 );
+
+            ResetDate();
         }
 
 
@@ -81,19 +83,20 @@ namespace FileDateChanger
 
         private void ShowMessageBox(string message)
         {
-            MaterialSnackBar snackBar = new MaterialSnackBar(message, 1300);
-            snackBar.Show(this);
+            MsgBox messageBox = new MsgBox(message, 120);
+            messageBox.Show(this);
         }
 
         private void BeginEdit()
         {
             if (selectedIndex >= 0)
             {
+                string fileName = Path.GetFileNameWithoutExtension(listBox1.Items[selectedIndex].ToString());
                 Rectangle rectangle = listBox1.GetItemRectangle(selectedIndex);
                 textBox1.Visible = true;
                 textBox1.Location = new Point(listBox1.Left + rectangle.X, listBox1.Top + rectangle.Y);
                 textBox1.Width = rectangle.Width + 2;
-                textBox1.Text = Path.GetFileNameWithoutExtension(listBox1.Items[selectedIndex].ToString());
+                textBox1.Text = fileName;
                 textBox1.Focus();
                 fileEditing = true;
             }
@@ -118,6 +121,7 @@ namespace FileDateChanger
                         {
                             File.Move(oldFullName, newFullName);
                             listBox1.Items[selectedIndex] = newFullName;
+                            ShowMessageBox("File renamed");
                         }
                         catch (Exception exc)
                         {
@@ -133,7 +137,6 @@ namespace FileDateChanger
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            ResetDate();
             serializer.Open();
             Location = serializer.Properties.Location;
             materialSwitch1.Checked = serializer.Properties.DarkTheme;
@@ -242,6 +245,7 @@ namespace FileDateChanger
             if (!fileEditing && selectedIndex > -1)
             {
                 string name = listBox1.SelectedItem.ToString();
+
                 if (File.Exists(name))
                 {
                     GetFileDate(name);
@@ -399,13 +403,14 @@ namespace FileDateChanger
                 using (RandomNameForm form = new RandomNameForm(oldName))
                 {
                     form.ShowDialog(this);
-                    string newName = form.GetName();
+                    string newName = form.RandomName;
                     string newFullName = Path.Combine(directory, newName + extension);
 
                     if (!string.IsNullOrEmpty(newName) && !oldName.Equals(newName))
                     {
                         File.Move(oldFullName, newFullName);
                         listBox1.Items[selectedIndex] = newFullName;
+                        ShowMessageBox("File renamed");
                     }
                 }
 
