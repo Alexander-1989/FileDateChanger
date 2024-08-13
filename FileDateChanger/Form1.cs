@@ -402,6 +402,7 @@ namespace FileDateChanger
 
                 using (RandomNameForm form = new RandomNameForm(oldName))
                 {
+                    form.BringToFront();
                     form.ShowDialog(this);
                     string newName = form.RandomName;
                     string newFullName = Path.Combine(directory, newName + extension);

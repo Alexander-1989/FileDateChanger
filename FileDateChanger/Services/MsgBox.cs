@@ -162,23 +162,23 @@ namespace FileDateChanger.Services
             {
                 Width = MaxWidth;
             }
+            else if (Owner.Width < MinWidth)
+            {
+                Width = MinWidth;
+            }
             else
             {
-                Width = Owner.Width < MinWidth ? MinWidth : Owner.Width - 12;
+                Width = Owner.Width - 12;
             }
-            Location = new Point(Owner.Location.X + ((Owner.Width - Width) / 2), Owner.Location.Y + Owner.Height - Height - 6);
-            timer.Start();
+            Location = new Point(Owner.Location.X + (Owner.Width - Width) / 2, Owner.Location.Y + Owner.Height - Height - 6);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            Rectangle rect = new Rectangle(new Point(0, 0), Size);
+            Rectangle rect = new Rectangle(new Point(), Size);
             e.Graphics.DrawString(text, font, fontBrush, rect, stringFormat);
-            if (!Owner.Focused)
-            {
-                Owner.Focus();
-            }
+            timer.Start();
         }
 
         public new void Show()
